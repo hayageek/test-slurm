@@ -50,8 +50,10 @@ startSlurmWeb(){
   pushd "${APP_PATH}" >/dev/null
   #SLURM_WEB_TAG="${version}" docker-compose up -d
 
-  #dashboard/clusters.config.js is missing in the repository
+  #update dashboard/clusters.config.js & config.json files
   cp -f ${APP_PATH}/clusters.config.js ${GIT_REPO}/conf/dashboard/
+  cp -f ${APP_PATH}/config.json ${GIT_REPO}/conf/dashboard/
+
   docker run  -d -v ${GIT_REPO}/conf:/etc/slurm-web \
               -v /etc/slurm:/etc/slurm-llnl \
               -p 8080:80 \
@@ -99,7 +101,7 @@ waitForServer() {
 
 
 # Convert existing data file to a human-readable JSON file
-#convertFingerprint "${BINPROTO}" "${JSON_DATA}"
+convertFingerprint "${BINPROTO}" "${JSON_DATA}"
 
 # Clone slurmweb UI repository if not already present
 if [[ ! -d "${GIT_REPO}" ]]; then
@@ -125,7 +127,7 @@ for app_version in "${ALL_VERSIONS[@]}"; do
   startSlurmWeb "${app_version}"
 
   echo "Waiting for slurmweb ${app_version} to be ready ..."
-  sleep 10
+  sleep 20
 
   # Wait for the container to be fully up
   waitForServer
