@@ -80,7 +80,7 @@ stopSlurmWeb(){
 }
 
 waitForServer() {
-  local url="http://localhost:8080"
+  local url="http://localhost:8080/slurm/"
   local wait_time="${2:-5}"
 
   echo "Waiting for server at $url to be available..."
@@ -140,7 +140,7 @@ for app_version in "${ALL_VERSIONS[@]}"; do
     "${app_version}" \
     "${FINGERPRINTS_PATH}" \
     "${GIT_REPO}" \
-    "http://localhost:8080"
+    "http://localhost:8080/slurm/"
 
   # Stop and remove the container
   stopSlurmWeb "${app_version}"
