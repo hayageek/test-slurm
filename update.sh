@@ -97,7 +97,7 @@ waitForServer() {
 
 resetGit(){
   pushd "${APP_PATH}" >/dev/null
-  git reset
+  git reset --hard
   popd >/dev/null
 }
 
