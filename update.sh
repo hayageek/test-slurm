@@ -149,7 +149,6 @@ for app_version in "${ALL_VERSIONS[@]}"; do
 
 done
 
-removeCluster
 
 # Convert the updated JSON data to binary proto format
 convertFingerprint "${JSON_DATA}" "${BIN_DATA}"
