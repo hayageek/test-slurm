@@ -35,7 +35,7 @@ buildSlurmWebImage(){
   local version="$1"
   pushd "${GIT_REPO}" >/dev/null
   cd docker/container
-  docker build -t slurmweb:${version} -f Dockerfile .
+  docker build -t docker.io/slumrweb/slurmweb:${version} -f Dockerfile .
   cd -
   popd >/dev/null
 }
@@ -55,7 +55,7 @@ startSlurmWeb(){
 stopContainer(){
   local name="$1"
   CONTAINER_ID=$(docker ps | grep "${name}" | cut -d " " -f1)
-  if [ -n "$KUBEFLOW_CONTAINER" ]; then
+  if [ -n "$CONTAINER_ID" ]; then
     docker stop $CONTAINER_ID
   fi
 
@@ -101,9 +101,7 @@ fi
 
 # Read all versions to be fingerprinted
 readarray -t ALL_VERSIONS < "${SCRIPT_PATH}/versions.txt"
-declare -a ALL_VERSIONS=(
-[0]=2.2.0
-)
+
 
 # Update fingerprints for all listed versions
 for app_version in "${ALL_VERSIONS[@]}"; do

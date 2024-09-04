@@ -1,10 +1,8 @@
 version: '3.7'
 
 services:
-  kubeflow:
-    image: slrumweb:${SLURM_WEB_TAG}
-    depends_on:
-      - kind
+  slurmweb:
+    image: docker.io/slumrweb/slrumweb:${SLURM_WEB_TAG}
     ports:
       - "8080:80"
     volumes:
