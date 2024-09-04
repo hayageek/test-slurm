@@ -95,6 +95,12 @@ waitForServer() {
   done
 }
 
+resetGit(){
+  pushd "${APP_PATH}" >/dev/null
+  git reset
+  popd >/dev/null
+}
+
 
 # Convert existing data file to a human-readable JSON file
 convertFingerprint "${BINPROTO}" "${JSON_DATA}"
@@ -112,6 +118,9 @@ readarray -t ALL_VERSIONS < "${SCRIPT_PATH}/versions.txt"
 # Update fingerprints for all listed versions
 for app_version in "${ALL_VERSIONS[@]}"; do
   echo "Fingerprinting slurmweb UI version ${app_version} ..."
+
+  #We are adding the files to repo, so we need to reset.
+  resetGit
 
   # Checkout the repository to the correct tag
   checkOutRepo "${GIT_REPO}" "v${app_version}"
@@ -148,8 +157,6 @@ for app_version in "${ALL_VERSIONS[@]}"; do
 
   removeSlurmWebImage "${app_version}"
 
-  #Remove uncommitted changes.
-  git stash
 
 done
 
