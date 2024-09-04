@@ -35,7 +35,7 @@ buildSlurmWebImage(){
   local version="$1"
   pushd "${GIT_REPO}" >/dev/null
   cd docker/container
-  docker build -t docker.io/slumrweb/slurmweb:${version} -f Dockerfile .
+  docker build -t slurmweb:${version} -f Dockerfile .
   cd -
   popd >/dev/null
 }
@@ -48,7 +48,15 @@ removeSlurmWebImage(){
 startSlurmWeb(){
   local version="$1"
   pushd "${APP_PATH}" >/dev/null
-  SLURM_WEB_TAG="${version}" docker-compose up -d
+  #SLURM_WEB_TAG="${version}" docker-compose up -d
+
+  #dashboard/clusters.config.js is missing in the repository
+  cp -f ${APP_PATH}/clusters.config.js ${GIT_REPO}/conf/dashboard/
+  docker run  -v ${GIT_REPO}/conf:/etc/slurm-web \
+              -v /etc/slurm:/etc/slurm-llnl \
+              -p 8080:80 \
+              slurmweb:${version}
+
   popd >/dev/null
 }
 
