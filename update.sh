@@ -50,10 +50,6 @@ startSlurmWeb(){
   pushd "${APP_PATH}" >/dev/null
   #SLURM_WEB_TAG="${version}" docker-compose up -d
 
-  #update dashboard/clusters.config.js & config.json files
-  cp -f ${APP_PATH}/clusters.config.js ${GIT_REPO}/conf/dashboard/
-  cp -f ${APP_PATH}/config.json ${GIT_REPO}/conf/dashboard/
-
   docker run  -d -v ${GIT_REPO}/conf:/etc/slurm-web \
               -v /etc/slurm:/etc/slurm-llnl \
               -p 8080:80 \
@@ -120,6 +116,11 @@ for app_version in "${ALL_VERSIONS[@]}"; do
   # Checkout the repository to the correct tag
   checkOutRepo "${GIT_REPO}" "v${app_version}"
 
+  #update dashboard/clusters.config.js & config.json files
+  cp -f ${APP_PATH}/clusters.config.js ${GIT_REPO}/conf/dashboard/
+  cp -f ${APP_PATH}/config.json ${GIT_REPO}/conf/dashboard/
+
+
   # Build and run the container
   buildSlurmWebImage "${app_version}"
 
@@ -146,6 +147,9 @@ for app_version in "${ALL_VERSIONS[@]}"; do
   stopSlurmWeb "${app_version}"
 
   removeSlurmWebImage "${app_version}"
+
+  #Remove uncommitted changes.
+  git stash
 
 done
 
