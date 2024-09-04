@@ -105,11 +105,6 @@ resetGit(){
 # Convert existing data file to a human-readable JSON file
 convertFingerprint "${BINPROTO}" "${JSON_DATA}"
 
-# Clone slurmweb UI repository if not already present
-if [[ ! -d "${GIT_REPO}" ]]; then
-  git clone https://github.com/rackslab/Slurm-web.git "${GIT_REPO}"
-fi
-
 
 # Read all versions to be fingerprinted
 readarray -t ALL_VERSIONS < "${SCRIPT_PATH}/versions.txt"
@@ -119,8 +114,11 @@ readarray -t ALL_VERSIONS < "${SCRIPT_PATH}/versions.txt"
 for app_version in "${ALL_VERSIONS[@]}"; do
   echo "Fingerprinting slurmweb UI version ${app_version} ..."
 
-  #We are adding the files to repo, so we need to reset.
-  resetGit
+  # We are adding some files to the repository so, we need to the existing repo.
+  rm -rfd ${GIT_REPO}
+  #Clone the repository
+  git clone --depth 1 --branch "v${app_version}" https://github.com/rackslab/Slurm-web.git "${GIT_REPO}" 
+
 
   # Checkout the repository to the correct tag
   checkOutRepo "${GIT_REPO}" "v${app_version}"
