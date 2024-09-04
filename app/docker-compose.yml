@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  kubeflow:
+    image: slrumweb:${SLURM_WEB_TAG}
+    depends_on:
+      - kind
+    ports:
+      - "8080:80"
+    volumes:
+      - ./clusters.config.js:/etc/slurm-web/dashboard/clusters.config.js
+      - ../Slurm-web/conf/:/etc/slurm-web
