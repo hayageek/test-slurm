@@ -52,7 +52,7 @@ startSlurmWeb(){
 
   #dashboard/clusters.config.js is missing in the repository
   cp -f ${APP_PATH}/clusters.config.js ${GIT_REPO}/conf/dashboard/
-  docker run  -v ${GIT_REPO}/conf:/etc/slurm-web \
+  docker run  -d -v ${GIT_REPO}/conf:/etc/slurm-web \
               -v /etc/slurm:/etc/slurm-llnl \
               -p 8080:80 \
               slurmweb:${version}
