@@ -49,9 +49,9 @@ startSlurmWeb(){
   local version="$1"
   pushd "${APP_PATH}" >/dev/null
   #SLURM_WEB_TAG="${version}" docker-compose up -d
-
   docker run  -d -v ${GIT_REPO}/conf:/etc/slurm-web \
-              -v /etc/slurm:/etc/slurm-llnl \
+              -v ${APP_PATH}/clusters.config.js:/etc/slurm-web/dashboard/clusters.config.js \
+              -v ${APP_PATH}/config.json:/etc/slurm-web/dashboard/config.json \
               -p 8080:80 \
               slurmweb:${version}
 
@@ -95,11 +95,6 @@ waitForServer() {
   done
 }
 
-resetGit(){
-  pushd "${APP_PATH}" >/dev/null
-  git reset --hard
-  popd >/dev/null
-}
 
 
 # Convert existing data file to a human-readable JSON file
@@ -109,24 +104,17 @@ convertFingerprint "${BINPROTO}" "${JSON_DATA}"
 # Read all versions to be fingerprinted
 readarray -t ALL_VERSIONS < "${SCRIPT_PATH}/versions.txt"
 
+# Clone Slurm-web repository if not already present
+if [[ ! -d "${GIT_REPO}" ]]; then
+  git clone https://github.com/rackslab/Slurm-web.git "${GIT_REPO}"
+fi
 
 # Update fingerprints for all listed versions
 for app_version in "${ALL_VERSIONS[@]}"; do
   echo "Fingerprinting slurmweb UI version ${app_version} ..."
 
-  # We are adding some files to the repository so, we need to the existing repo.
-  rm -rfd ${GIT_REPO}
-  #Clone the repository
-  git clone --depth 1 --branch "v${app_version}" https://github.com/rackslab/Slurm-web.git "${GIT_REPO}" 
-
-
   # Checkout the repository to the correct tag
   checkOutRepo "${GIT_REPO}" "v${app_version}"
-
-  #update dashboard/clusters.config.js & config.json files
-  cp -f ${APP_PATH}/clusters.config.js ${GIT_REPO}/conf/dashboard/
-  cp -f ${APP_PATH}/config.json ${GIT_REPO}/conf/dashboard/
-
 
   # Build and run the container
   buildSlurmWebImage "${app_version}"
@@ -135,7 +123,7 @@ for app_version in "${ALL_VERSIONS[@]}"; do
   startSlurmWeb "${app_version}"
 
   echo "Waiting for slurmweb ${app_version} to be ready ..."
-  sleep 20
+  sleep 10
 
   # Wait for the container to be fully up
   waitForServer
